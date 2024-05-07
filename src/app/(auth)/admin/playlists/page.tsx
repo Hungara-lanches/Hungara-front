@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 async function listPlaylists() {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.URL}/list-playlists`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/list-playlists`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

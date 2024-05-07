@@ -5,12 +5,15 @@ import { EditEstablishment } from "./_components/edit-establishment";
 async function listEstablishmentById(id: number): Promise<IEstablishment> {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.URL}/list-establishment/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/list-establishment/${id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    }
+  );
   if (!res.ok) {
     Response.json("Erro ao listar o estabelecimento", {
       status: res.status,

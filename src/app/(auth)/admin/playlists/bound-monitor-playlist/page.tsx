@@ -9,7 +9,7 @@ import { FormGrid } from "./_components/form-grid";
 async function listPlaylists(): Promise<IPlaylist[]> {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.URL}/list-playlists`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/list-playlists`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -26,7 +26,7 @@ async function listPlaylists(): Promise<IPlaylist[]> {
 async function listMonitors() {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.URL}/list-monitors`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/list-monitors`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

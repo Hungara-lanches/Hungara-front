@@ -17,7 +17,7 @@ async function listEstablishments(): Promise<IEstablishmentList> {
   const token = cookies().get("token");
 
   const res = await fetch(
-    `${process.env.URL}/list-establishments-admin?page=1&page_size=1000`,
+    `${process.env.NEXT_PUBLIC_URL}/list-establishments-admin?page=1&page_size=1000`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ async function listMonitorEstablishment(establishmentId: number) {
   const token = cookies().get("token");
 
   const res = await fetch(
-    `${process.env.URL}/list-establishment-monitors?id=${establishmentId}`,
+    `${process.env.NEXT_PUBLIC_URL}/list-establishment-monitors?id=${establishmentId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

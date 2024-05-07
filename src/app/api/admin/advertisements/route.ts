@@ -4,14 +4,17 @@ export async function POST(req: Request) {
   const token = cookies().get("token");
   const data = await req.formData();
 
-  const res = await fetch(`${process.env.URL}/create-advertisement`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: data,
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/create-advertisement`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: data,
+      cache: "no-store",
+    }
+  );
   console.log(data);
 
   if (!res.ok) {
@@ -32,13 +35,16 @@ export async function DELETE(req: Request) {
 
   console.log("id", id);
 
-  const res = await fetch(`${process.env.URL}/delete-advertisement/${+id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/delete-advertisement/${+id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     console.log(await res.text());

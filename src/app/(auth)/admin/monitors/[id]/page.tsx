@@ -6,7 +6,7 @@ import { IEstablishmentList } from "../../../../../model/establishment";
 async function listMonitorstById(id: number): Promise<IMonitor> {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.URL}/list-monitor/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/list-monitor/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -25,7 +25,7 @@ async function listEstablishments(): Promise<IEstablishmentList> {
   const token = cookies().get("token");
 
   const res = await fetch(
-    `${process.env.URL}/list-establishments-admin?page=1&page_size=1000`,
+    `${process.env.NEXT_PUBLIC_URL}/list-establishments-admin?page=1&page_size=1000`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

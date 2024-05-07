@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   const token = cookies().get("token");
   const data = await req.json();
 
-  const res = await fetch(`${process.env.URL}/create-monitor`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/create-monitor`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,15 +30,18 @@ export async function DELETE(req: Request) {
   const token = cookies().get("token");
   const { id } = await req.json();
 
-  const res = await fetch(`${process.env.URL}/delete-monitor/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/delete-monitor/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
 
-    cache: "no-store",
-  });
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     return Response.json("Erro ao deletar o monitor" + (await res.text()), {

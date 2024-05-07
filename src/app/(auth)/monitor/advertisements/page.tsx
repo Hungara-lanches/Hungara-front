@@ -17,7 +17,7 @@ async function getMe(): Promise<IMeMonitor> {
 
   const revalidateTime = 15 * 60 * 1000; // 15 min
 
-  const monitorInfo = await fetch(`${process.env.URL}/me-monitor`, {
+  const monitorInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor`, {
     headers: {
       Authorization: `Bearer ${token?.value}`,
     },

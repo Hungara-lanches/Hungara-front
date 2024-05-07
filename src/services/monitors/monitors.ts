@@ -1,7 +1,7 @@
 import { IMonitor } from "../../model/monitor";
 
 export async function listMonitors(): Promise<IMonitor[]> {
-  const res = await fetch(`${process.env.URL}/list-monitors`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/list-monitors`);
   if (!res.ok) {
     throw new Error(res.statusText);
   }
@@ -13,7 +13,7 @@ export async function listMonitorsEstablishmentLogin(
   establishmentId: string
 ): Promise<IMonitor[]> {
   const res = await fetch(
-    `${process.env.URL}/list-establishment-monitors-login?id=${establishmentId}`,
+    `${process.env.NEXT_PUBLIC_URL}/list-establishment-monitors-login?id=${establishmentId}`,
     {
       cache: "no-store",
     }

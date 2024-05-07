@@ -7,13 +7,16 @@ import { IAdvertisement } from "../../../../model/advertisement";
 async function listAdvertisementsAdmin(): Promise<IAdvertisement[]> {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.URL}/list-advertisements`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token?.value}`,
-    },
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/list-advertisements`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token?.value}`,
+      },
+    }
+  );
 
   if (!res.ok) {
     throw new Error(await res.text());

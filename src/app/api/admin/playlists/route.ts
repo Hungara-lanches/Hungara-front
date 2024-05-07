@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   const token = cookies().get("token");
   const data = await req.json();
 
-  const res = await fetch(`${process.env.URL}/create-playlist`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/create-playlist`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

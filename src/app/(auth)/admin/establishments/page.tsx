@@ -18,7 +18,7 @@ async function listEstablishmentsAdmin(page: number) {
 
   const token = cookies().get("token");
   const res = await fetch(
-    `${process.env.URL}/list-establishments-admin?page=${page}&page_size=${pageSize}`,
+    `${process.env.NEXT_PUBLIC_URL}/list-establishments-admin?page=${page}&page_size=${pageSize}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -4,15 +4,18 @@ export async function POST(req: Request) {
   const token = cookies().get("token");
   const data = await req.json();
 
-  const res = await fetch(`${process.env.URL}/create-establishment`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/create-establishment`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     return Response.json("Erro ao criar o estabelecimento", {
@@ -30,15 +33,18 @@ export async function PATCH(req: Request) {
   const token = cookies().get("token");
   const { id, ...data } = await req.json();
 
-  const res = await fetch(`${process.env.URL}/update-establishment/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/update-establishment/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     return Response.json("Erro ao atualizar o estabelecimento", {
@@ -58,13 +64,16 @@ export async function DELETE(req: Request) {
 
   console.log(id);
 
-  const res = await fetch(`${process.env.URL}/delete-establishment/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/delete-establishment/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     console.log(await res.text());

@@ -15,7 +15,7 @@ async function listMonitorsEstablishmentLogin(
   establishmentId: string
 ): Promise<IMonitor[]> {
   const res = await fetch(
-    `${process.env.URL}/list-establishment-monitors-login?id=${establishmentId}`,
+    `${process.env.NEXT_PUBLIC_URL}/list-establishment-monitors-login?id=${establishmentId}`,
     {
       cache: "no-store",
     }
@@ -28,9 +28,12 @@ async function listMonitorsEstablishmentLogin(
 }
 
 async function listEstablishments(): Promise<IEstablishmentList> {
-  const res = await fetch(`${process.env.URL}/list-establishments`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/list-establishments`,
+    {
+      cache: "no-store",
+    }
+  );
   if (!res.ok) {
     throw new Error(res.statusText);
   }
