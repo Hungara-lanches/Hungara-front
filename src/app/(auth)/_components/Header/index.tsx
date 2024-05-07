@@ -1,26 +1,32 @@
 "use client";
 
 import { Menu, Transition } from "@headlessui/react";
-import {
-  Bars3Icon,
-  BellIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { useSidebar } from "../../../context/sidebarContext";
+import { useRouter } from "next/navigation";
 
-const userNavigation = [
-  { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
-];
+const userNavigation = [{ name: "Sair", href: "/login" }];
 
 export const Header = () => {
   const { sidebarOpen, setSidebarOpen } = useSidebar();
-
-  console.log(sidebarOpen);
+  const { push } = useRouter();
 
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
+  }
+
+  async function signout() {
+    try {
+      const res = await fetch("/api/cookie", {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        throw new Error("An error occurred while signing out");
+      }
+      push("/login");
+    } catch (error) {}
   }
 
   return (
@@ -38,13 +44,13 @@ export const Header = () => {
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           <Menu as="div" className="relative">
             <Menu.Button className="-m-1.5 flex items-center p-1.5">
-              <span className="sr-only">Open user menu</span>
+              <span className="sr-only">Abrir menu</span>
               <span className="hidden lg:flex lg:items-center">
                 <span
                   className="ml-4 text-sm font-semibold leading-6 text-gray-900"
                   aria-hidden="true"
                 >
-                  Tom Cook
+                  Admin
                 </span>
                 <ChevronDownIcon
                   className="ml-2 h-5 w-5 text-gray-400"
@@ -65,15 +71,15 @@ export const Header = () => {
                 {userNavigation.map((item) => (
                   <Menu.Item key={item.name}>
                     {({ active }) => (
-                      <a
-                        href={item.href}
+                      <span
+                        onClick={signout}
                         className={classNames(
                           active ? "bg-gray-50" : "",
-                          "block px-3 py-1 text-sm leading-6 text-gray-900"
+                          "block px-3 py-1 text-sm leading-6 text-center text-gray-900 cursor-pointer hover:bg-gray-50"
                         )}
                       >
                         {item.name}
-                      </a>
+                      </span>
                     )}
                   </Menu.Item>
                 ))}

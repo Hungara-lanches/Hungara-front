@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { IMeMonitor } from "../../../../../model/monitor";
+import Image from "next/image";
 
 interface AdvertisementGridProps {
   monitor: IMeMonitor;
@@ -19,7 +20,9 @@ export function AdvertisementGrid({ monitor }: AdvertisementGridProps) {
         (prevIndex) => (prevIndex + 1) % advertisementCount
       );
     }, monitor.user.advertisements[currentAdvertisementIndex].duration * 1000);
-    videoRef.current?.load();
+    if (currentAdvertisement.type === "video") {
+      videoRef.current?.load();
+    }
     return () => clearTimeout(advertisementTimer);
   }, [currentAdvertisementIndex, monitor]);
 
@@ -28,16 +31,27 @@ export function AdvertisementGrid({ monitor }: AdvertisementGridProps) {
 
   return (
     <div>
-      <video
-        className="fixed left-0 top-0 w-screen h-screen object-cover"
-        ref={videoRef as unknown as React.RefObject<HTMLVideoElement>}
-        autoPlay
-        muted
-        controlsList="nodownload  noremoteplayback"
-      >
-        <source src={currentAdvertisement.url} />
-        Your browser does not support the video tag.
-      </video>
+      {currentAdvertisement.type === "video" ? (
+        <video
+          aria-label="Propagandas"
+          className="w-full h-full fixed left-0 top-0 right-0 object-cover"
+          ref={videoRef as unknown as React.RefObject<HTMLVideoElement>}
+          autoPlay
+          muted
+          controlsList="nodownload  noremoteplayback"
+        >
+          <source src={currentAdvertisement.url} />
+          Your browser does not support the video tag.
+        </video>
+      ) : (
+        <Image
+          className="object-center"
+          fill
+          quality={100}
+          src={currentAdvertisement.url}
+          alt={currentAdvertisement.name}
+        />
+      )}
     </div>
   );
 }

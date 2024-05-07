@@ -4,7 +4,7 @@ import Link from "next/link";
 import ListAdvertisements from "./_components/list-advertisements";
 import { IAdvertisement } from "../../../../model/advertisement";
 
-export async function listAdvertisementsAdmin(): Promise<IAdvertisement[]> {
+async function listAdvertisementsAdmin(): Promise<IAdvertisement[]> {
   const token = cookies().get("token");
 
   const res = await fetch(`${process.env.URL}/list-advertisements`, {

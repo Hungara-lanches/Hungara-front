@@ -1,16 +1,42 @@
 import { Suspense } from "react";
 
-import { listMonitorsEstablishmentLogin } from "../../services/monitors/monitors";
-
 import FormAdmin from "./_components/form-admin";
 import FormMonitor from "./_components/form-monitor";
 import { Metadata } from "next";
-import { listEstablishments } from "../../services/establishment/establishment";
+import { IMonitor } from "../../model/monitor";
+import { IEstablishmentList } from "../../model/establishment";
 
 export const metadata: Metadata = {
   title: "Login",
   description: "Tela de login",
 };
+
+async function listMonitorsEstablishmentLogin(
+  establishmentId: string
+): Promise<IMonitor[]> {
+  const res = await fetch(
+    `${process.env.URL}/list-establishment-monitors-login?id=${establishmentId}`,
+    {
+      cache: "no-store",
+    }
+  );
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  return res.json();
+}
+
+async function listEstablishments(): Promise<IEstablishmentList> {
+  const res = await fetch(`${process.env.URL}/list-establishments`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  return res.json();
+}
 
 export default async function Login({
   searchParams,

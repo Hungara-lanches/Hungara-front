@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
 import Image from "next/image";
@@ -24,6 +24,7 @@ export function CreateAdvertisementForm({
   );
 
   const schema = z.object({
+    type: z.string().min(1, "Tipo da propaganda é obrigatório"),
     name: z.string().min(1, "Nome da propaganda é obrigatório"),
     duration: z.string().min(1, "Duração da propaganda é obrigatória"),
     playlistId: z.string().min(1, "Playlist é obrigatória"),
@@ -40,22 +41,54 @@ export function CreateAdvertisementForm({
   const {
     register,
     reset,
+    getValues,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ISchema>({
     resolver: zodResolver(schema),
   });
+
+  const typeWatch = watch("type");
+
+  // const handleSelectAdvertisement = (
+  //   e: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setSelectedFile(file);
+  //     setValue("url", file);
+  //     const fileType = file.type.split("/")[0];
+  //     setSelectedType(fileType as "image" | "video");
+  //   } else {
+  //     setSelectedFile(null);
+  //     setValue("url", undefined);
+  //     setSelectedType(null);
+  //   }
+  // };
 
   const handleSelectAdvertisement = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (file) {
+      const fileType = file.type.split("/")[0];
+      if (typeWatch === "image" && fileType === "video") {
+        toast.error(
+          "Não é possível adicionar um vídeo se você selecionou imagem"
+        );
+        return;
+      }
+
       setSelectedFile(file);
       setValue("url", file);
-      const fileType = file.type.split("/")[0];
       setSelectedType(fileType as "image" | "video");
+      if (fileType === "image") {
+        e.target.accept = "image/*";
+      } else if (fileType === "video") {
+        e.target.accept = "video/*";
+      }
     } else {
       setSelectedFile(null);
       setValue("url", undefined);
@@ -68,6 +101,7 @@ export function CreateAdvertisementForm({
     formData.append("name", data.name);
     formData.append("playlistId", data.playlistId.toString());
     formData.append("duration", data.duration.toString());
+    formData.append("type", data.type);
     if (selectedFile) {
       formData.append("url", selectedFile);
     } else {
@@ -100,6 +134,17 @@ export function CreateAdvertisementForm({
     setSelectedType(null);
   }
 
+  const advertisementType = [
+    {
+      value: "video",
+      label: "Vídeo",
+    },
+    {
+      value: "image",
+      label: "Imagem",
+    },
+  ];
+
   return (
     <>
       <Toaster />
@@ -108,6 +153,22 @@ export function CreateAdvertisementForm({
         className="mt-24 w-full flex flex-col gap-5"
       >
         <div className="flex flex-wrap gap-5">
+          <div className="max-w-96 w-full">
+            <Select
+              {...register("type")}
+              isInvalid={!!errors.type}
+              errorMessage={errors.type?.message}
+              size="lg"
+              label="Selecione o tipo de propaganda"
+            >
+              {advertisementType.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+
           <div className="max-w-96 w-full">
             <Input
               {...register("name")}
@@ -204,6 +265,7 @@ export function CreateAdvertisementForm({
                   isInvalid={!!errors.url}
                   errorMessage={errors.url?.message}
                   type="file"
+                  accept={getValues("type") === "image" ? "image/*" : "video/*"}
                   size="lg"
                   aria-label="URL da propaganda"
                   onChange={handleSelectAdvertisement}

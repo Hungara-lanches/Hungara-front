@@ -65,7 +65,6 @@ export default function FormMonitor({
   });
 
   const onSubmits = async function (data: ISchema) {
-    console.log(data);
     try {
       const response = await fetch("/api/auth/monitor", {
         method: "POST",

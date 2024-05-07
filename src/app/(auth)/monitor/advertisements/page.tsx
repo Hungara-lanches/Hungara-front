@@ -8,18 +8,23 @@ export const metadata: Metadata = {
   description: "Propagandas exibidas no monitor",
 };
 
-export async function getMe(): Promise<IMeMonitor> {
+async function getMe(): Promise<IMeMonitor> {
   const token = cookies().get("token");
 
   if (!token) {
     throw new Error("Not authorized");
   }
 
+  const revalidateTime = 15 * 60 * 1000; // 15 min
+
   const monitorInfo = await fetch(`${process.env.URL}/me-monitor`, {
     headers: {
       Authorization: `Bearer ${token?.value}`,
     },
     cache: "no-store",
+    next: {
+      revalidate: revalidateTime,
+    },
   });
 
   if (!monitorInfo.ok) {

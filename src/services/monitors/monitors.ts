@@ -19,7 +19,8 @@ export async function listMonitorsEstablishmentLogin(
     }
   );
   if (!res.ok) {
-    throw new Error(res.statusText);
+    console.log(await res.text());
+    // throw new Error(res.statusText);
   }
 
   return res.json();

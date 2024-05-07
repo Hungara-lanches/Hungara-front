@@ -56,6 +56,8 @@ export async function DELETE(req: Request) {
   const token = cookies().get("token");
   const { id } = await req.json();
 
+  console.log(id);
+
   const res = await fetch(`${process.env.URL}/delete-establishment/${id}`, {
     method: "DELETE",
     headers: {
@@ -65,6 +67,7 @@ export async function DELETE(req: Request) {
   });
 
   if (!res.ok) {
+    console.log(await res.text());
     return Response.json("Erro ao deletar o estabelecimento", {
       status: res.status,
     });

@@ -3,6 +3,7 @@ export interface IAdvertisement {
   url: string;
   duration: number;
   createdAt: Date;
+  type: string;
   updatedAt: Date;
   name: string;
   playlistId: number;
