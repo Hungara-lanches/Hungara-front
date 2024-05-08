@@ -40,7 +40,7 @@ export default function FormAdmin() {
 
   const onSubmits = async function (data: ISchema) {
     try {
-      const response = await fetch("http://localhost:3000/api/auth", {
+      const response = await fetch("/api/auth", {
         method: "POST",
         body: JSON.stringify({
           email: data.email,

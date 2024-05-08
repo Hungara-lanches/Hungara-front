@@ -7,26 +7,21 @@ export async function middleware(request: NextRequest) {
 
   if (!token) return NextResponse.redirect(new URL("/login", request.url));
 
-  const userInfo = await fetch("http://localhost:8080/api/hungara/me-admin", {
+  const userInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-admin`, {
     headers: {
       Authorization: `Bearer ${token?.value}`,
     },
     cache: "no-store",
   });
 
-  const monitorInfo = await fetch(
-    "http://localhost:8080/api/hungara/me-monitor",
-    {
-      headers: {
-        Authorization: `Bearer ${token?.value}`,
-      },
-      cache: "no-store",
-    }
-  );
+  const monitorInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor`, {
+    headers: {
+      Authorization: `Bearer ${token?.value}`,
+    },
+    cache: "no-store",
+  });
 
   let account = await userInfo.json();
-
-  // const account = await userInfo.json();
 
   if (token && !account?.user) {
     account = await monitorInfo.json();

@@ -4,7 +4,7 @@ export async function POST(req: Request, res: Response) {
 
   try {
     const response = await fetch(
-      "http://localhost:8080/api/hungara/login-monitor",
+      `${process.env.NEXT_PUBLIC_URL}/login-monitor`,
       {
         method: "POST",
         body: JSON.stringify(bodyResponse),

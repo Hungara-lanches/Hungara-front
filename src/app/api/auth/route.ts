@@ -3,14 +3,11 @@ export async function POST(req: Request, res: Response) {
   const bodyResponse = await req.json();
 
   try {
-    const response = await fetch(
-      "http://localhost:8080/api/hungara/login-admin",
-      {
-        method: "POST",
-        body: JSON.stringify(bodyResponse),
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/login-admin`, {
+      method: "POST",
+      body: JSON.stringify(bodyResponse),
+      headers: { "Content-Type": "application/json" },
+    });
 
     if (response.ok) {
       const result = await response.json();
