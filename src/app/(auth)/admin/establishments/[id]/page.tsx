@@ -1,6 +1,23 @@
 import { cookies } from "next/headers";
 import { IEstablishment } from "../../../../../model/establishment";
 import { EditEstablishment } from "./_components/edit-establishment";
+import { Metadata } from "next";
+
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const id = +params.id;
+
+  const data = await listEstablishmentById(id);
+
+  return {
+    title: "Atualizar" + " " + data.name,
+    description: data.name,
+  };
+}
 
 async function listEstablishmentById(id: number): Promise<IEstablishment> {
   const token = cookies().get("token");

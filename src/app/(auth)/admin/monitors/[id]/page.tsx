@@ -2,6 +2,23 @@ import { cookies } from "next/headers";
 import { EditMonitor } from "./_componnets/edit-monitor";
 import { IMonitor } from "../../../../../model/monitor";
 import { IEstablishmentList } from "../../../../../model/establishment";
+import { Metadata } from "next";
+
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const id = +params.id;
+
+  const data = await listMonitorstById(id);
+
+  return {
+    title: "Atualizar" + " " + data.name,
+    description: data.name,
+  };
+}
 
 async function listMonitorstById(id: number): Promise<IMonitor> {
   const token = cookies().get("token");

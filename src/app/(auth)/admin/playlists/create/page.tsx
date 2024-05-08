@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import CreatePlaylistForm from "../_components/create-playlist";
+
+export const metadata: Metadata = {
+  title: "Criar playlist",
+  description: "Página para criar uma nova playlist",
+};
 
 export default function CreatePlaylist() {
   return (

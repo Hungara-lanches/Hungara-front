@@ -1,6 +1,12 @@
 import { cookies } from "next/headers";
 import CreateMonitorForm from "../_components/create-monitor";
 import { IEstablishmentList } from "../../../../../model/establishment";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Criar monitor",
+  description: "Página para criar um novo monitor",
+};
 
 async function listEstablishments(): Promise<IEstablishmentList> {
   const token = cookies().get("token");

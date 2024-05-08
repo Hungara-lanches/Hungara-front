@@ -1,5 +1,11 @@
 import { cookies } from "next/headers";
 import { CreateAdvertisementForm } from "../_components/create-advertisement";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Criar propaganda",
+  description: "Página para criar propagandas",
+};
 
 async function listPlaylists() {
   const token = cookies().get("token");

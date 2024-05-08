@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import CreateEstablishmentForm from "../_components/create-establishment";
+
+export const metadata: Metadata = {
+  title: "Criar estabelecimento",
+  description: "Página para criar um novo estabelecimento",
+};
 
 export default function CreateEstablishment() {
   return (

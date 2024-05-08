@@ -1,10 +1,14 @@
 import { cookies } from "next/headers";
-import { PlaylistsGrid } from "./_components/playlists-grid";
-import { IEstablishmentList } from "../../../../../model/establishment";
-import { MonitoresGrid } from "./_components/monitors-grid";
+
 import { Suspense } from "react";
 import { IPlaylist } from "../../../../../model/playlist";
 import { FormGrid } from "./_components/form-grid";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Vincular playlist",
+  description: "Página para vincular playlists aos monitores",
+};
 
 async function listPlaylists(): Promise<IPlaylist[]> {
   const token = cookies().get("token");

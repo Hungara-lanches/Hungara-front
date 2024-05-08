@@ -3,6 +3,12 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import ListAdvertisements from "./_components/list-advertisements";
 import { IAdvertisement } from "../../../../model/advertisement";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Propagandas",
+  description: "Página para listar propagandas",
+};
 
 async function listAdvertisementsAdmin(): Promise<IAdvertisement[]> {
   const token = cookies().get("token");
