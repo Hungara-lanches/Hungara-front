@@ -29,9 +29,9 @@ export function FilterMonitors({ establishments }: FilterMonitorsProps) {
 
   return (
     <Select
-      defaultSelectedKeys={
-        (searchParams.get("establishmentId") as string) || "1"
-      }
+      defaultSelectedKeys={[
+        (searchParams.get("establishmentId") as string) || "",
+      ]}
       onChange={(e) => handleSelectChange(e)}
       label="Selecione um estabelecimento"
     >

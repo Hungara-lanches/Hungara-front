@@ -2,7 +2,6 @@
 import {
   Chip,
   Pagination,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -17,7 +16,7 @@ import {
   IEstablishment,
   IEstablishmentList,
 } from "../../../../../../model/establishment";
-import { EyeIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import DeleteEstablishment from "../delete-establishment";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -118,9 +117,8 @@ export default function ListEstablishments({
                   <PencilIcon className="cursor-pointer w-5 h-5" />
                 </Link>
               </Tooltip>
-              <Tooltip color="danger" content="Deletar">
-                <DeleteEstablishment establishment={establishment} />
-              </Tooltip>
+
+              <DeleteEstablishment establishment={establishment} />
             </div>
           );
 

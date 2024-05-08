@@ -2,7 +2,6 @@
 import {
   Chip,
   Pagination,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -10,11 +9,10 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
-  getKeyValue,
 } from "@nextui-org/react";
 import { useCallback, useMemo, useState } from "react";
 
-import { EyeIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { IMonitor } from "../../../../../../model/monitor";
@@ -106,9 +104,8 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
                 <PencilIcon className="cursor-pointer w-5 h-5" />
               </Link>
             </Tooltip>
-            <Tooltip color="danger" content="Deletar">
-              <DeleteMonitor monitor={monitor} />
-            </Tooltip>
+
+            <DeleteMonitor monitor={monitor} />
           </div>
         );
 

@@ -1,24 +1,16 @@
 "use client";
 import {
-  Button,
-  Chip,
   Pagination,
-  Spinner,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
   TableRow,
-  Tooltip,
-  getKeyValue,
 } from "@nextui-org/react";
 import { useCallback, useMemo, useState } from "react";
 
-import { EyeIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
 import { IAdvertisement } from "../../../../../../model/advertisement";
 import DeleteAdvertisement from "../delete-advertisement";
 
@@ -106,9 +98,7 @@ export default function ListAdvertisements({
         case "actions":
           return (
             <div className="relative flex items-center gap-5">
-              <Tooltip color="danger" content="Deletar">
-                <DeleteAdvertisement advertisement={advertisement} />
-              </Tooltip>
+              <DeleteAdvertisement advertisement={advertisement} />
             </div>
           );
 

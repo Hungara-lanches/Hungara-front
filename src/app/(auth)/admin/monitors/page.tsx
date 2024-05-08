@@ -66,8 +66,6 @@ export default async function Monitors({
 
   const monitorsEstablishment = await listMonitorEstablishment(establishmentId);
 
-  console.log(establishments);
-
   return (
     <>
       <header className="flex items-center gap-5 mb-10 flex-wrap">

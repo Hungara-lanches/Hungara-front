@@ -14,7 +14,6 @@ import { useCallback, useMemo, useState } from "react";
 
 import { PencilIcon } from "@heroicons/react/24/outline";
 
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { IPlaylist } from "../../../../../../model/playlist";
 
@@ -25,10 +24,6 @@ interface listPlaylistsProps {
 export function ListPlaylists({ playlists }: listPlaylistsProps) {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { replace } = useRouter();
 
   const loadingState = isLoading || playlists.length === 0 ? "loading" : "idle";
 
@@ -102,9 +97,9 @@ export function ListPlaylists({ playlists }: listPlaylistsProps) {
                 <PencilIcon className="cursor-pointer w-5 h-5" />
               </Link>
             </Tooltip>
-            <Tooltip color="danger" content="Deletar">
-              {/* <DeleteEstablishment establishment={establishment} /> */}
-            </Tooltip>
+            {/* <Tooltip color="danger" content="Deletar"> */}
+            {/* <DeleteEstablishment establishment={establishment} /> */}
+            {/* </Tooltip> */}
           </div>
         );
 

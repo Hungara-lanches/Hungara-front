@@ -9,6 +9,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  Tooltip,
 } from "@nextui-org/react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
@@ -49,7 +50,9 @@ export default function DeleteAdvertisement({
   return (
     <>
       <Toaster />
-      <TrashIcon onClick={onOpen} className="cursor-pointer w-5 h-5" />
+      <Tooltip color="danger" content="Deletar">
+        <TrashIcon onClick={onOpen} className="cursor-pointer w-5 h-5" />
+      </Tooltip>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (

@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { Button } from "@nextui-org/react";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { IEstablishmentList } from "../../../../model/establishment";
 import { ListPlaylists } from "./_components/list-playlists";
 
 export const metadata: Metadata = {
