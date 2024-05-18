@@ -27,6 +27,17 @@ interface FormMonitorProps {
   establishments: IEstablishmentList;
 }
 
+declare const ActiveXObject: {
+  new (s: string): any;
+};
+interface ExtendedHTMLElement extends HTMLElement {
+  requestFullScreen?: () => Promise<void> | void;
+  webkitRequestFullScreen?: () => Promise<void> | void;
+  mozRequestFullScreen?: () => Promise<void> | void;
+  msRequestFullscreen?: () => Promise<void> | void;
+  msRequestFullScreen?: () => Promise<void> | void;
+}
+
 export default function FormMonitor({
   monitors,
   establishments,
@@ -42,6 +53,9 @@ export default function FormMonitor({
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  let element = document.body;
+
   const { push, replace } = useRouter();
 
   useEffect(() => {
@@ -64,7 +78,33 @@ export default function FormMonitor({
     },
   });
 
+  function requestFullScreen(element: ExtendedHTMLElement) {
+    const requestMethod =
+      element.requestFullscreen ||
+      element.webkitRequestFullScreen ||
+      element.mozRequestFullScreen ||
+      element.msRequestFullscreen;
+
+    const windowObj = window as any;
+
+    if (requestMethod) {
+      // Native full screen.
+      requestMethod.call(element);
+    } else if (typeof windowObj.ActiveXObject !== "undefined") {
+      // Older IE.
+      try {
+        const wscript = new (window as any).ActiveXObject("WScript.Shell");
+        if (wscript !== null) {
+          wscript.SendKeys("{F11}");
+        }
+      } catch (error) {
+        console.error("ActiveXObject is not supported or not enabled.");
+      }
+    }
+  }
+
   const onSubmits = async function (data: ISchema) {
+    var elem = document.body;
     try {
       const response = await fetch("/api/auth/monitor", {
         method: "POST",
@@ -77,6 +117,7 @@ export default function FormMonitor({
       });
 
       if (response.status === 200) {
+        requestFullScreen(elem);
         push("/monitor/advertisements");
       } else if (response.status === 401) {
         toast.error("Usuário ou senha inválida");
