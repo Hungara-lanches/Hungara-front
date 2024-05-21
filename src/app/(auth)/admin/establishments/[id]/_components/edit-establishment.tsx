@@ -33,7 +33,11 @@ export function EditEstablishment({ establishment }: EditEstablishmentProps) {
     },
   });
 
+  console.log(establishment);
+
   const handleSubmitUpdateEstablishment = async (data: ISchema) => {
+    console.log(data);
+
     try {
       const res = await fetch("/api/admin/establishments", {
         method: "PATCH",

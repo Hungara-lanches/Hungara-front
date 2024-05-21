@@ -2,7 +2,7 @@ export default function PlaylistDetails() {
   return (
     <>
       <header className="flex items-center gap-5 mb-10 flex-wrap">
-        <h1 className="text-2xl font-bold">Atualizar monitor</h1>
+        <h1 className="text-2xl font-bold">Atualizar playlist</h1>
       </header>
     </>
   );

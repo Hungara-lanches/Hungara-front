@@ -5,6 +5,7 @@ import { IMonitor } from "../../../../../../../model/monitor";
 import { IPlaylist } from "../../../../../../../model/playlist";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import refreshPath from "../../../../../../actions/revalidate";
 
 interface FormGridProps {
   playlists: IPlaylist[];
@@ -58,6 +59,7 @@ export function FormGrid({ monitors, playlists }: FormGridProps) {
         throw new Error(await res.text());
       }
       toast.success("Playlists vinculadas com sucesso");
+      refreshPath("/admin/playlists/bound-monitor-playlist");
       return res.json();
     } catch (error: any) {
       const errorMessage = JSON.parse(error.message) as string;
@@ -91,14 +93,16 @@ export function FormGrid({ monitors, playlists }: FormGridProps) {
       <div>
         <h2 className="text-1xl font-bold">Monitores:</h2>
         <div className="mt-5 flex flex-wrap gap-3">
-          {monitors.map((monitor) => (
-            <Checkbox
-              onChange={() => handleMonitorChange(monitor.id)}
-              key={monitor.id}
-            >
-              {monitor.name} <b>{`(${monitor.establishment.name})`}</b>
-            </Checkbox>
-          ))}
+          {monitors.map((monitor) =>
+            monitor.playlists.length ? null : (
+              <Checkbox
+                onChange={() => handleMonitorChange(monitor.id)}
+                key={monitor.id}
+              >
+                {monitor.name} <b>{`(${monitor.establishment.name})`}</b>
+              </Checkbox>
+            )
+          )}
         </div>
       </div>
 

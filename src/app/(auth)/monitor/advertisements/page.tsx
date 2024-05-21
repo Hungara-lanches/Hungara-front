@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { IMeMonitor } from "../../../../model/monitor";
 import { AdvertisementGrid } from "../_components/advertisement-grid";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Propagandas",
@@ -39,7 +40,9 @@ export default async function Advertisements() {
   return (
     <>
       <div className="w-screen h-screen">
-        <AdvertisementGrid monitor={monitor} />
+        <Suspense fallback="Carregando...">
+          <AdvertisementGrid monitor={monitor} />
+        </Suspense>
       </div>
     </>
   );

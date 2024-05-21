@@ -1,5 +1,6 @@
 import { IAdvertisement } from "./advertisement";
 import { IEstablishment } from "./establishment";
+import { IPlaylist } from "./playlist";
 
 export interface IMonitor {
   id: number;
@@ -9,14 +10,24 @@ export interface IMonitor {
   establishmentId: number;
   createdAt: Date;
   updatedAt: Date;
-  playlists: any;
+  playlists: [
+    {
+      playlist: IPlaylist;
+    }
+  ];
 }
 
 export interface IMeMonitor {
   user: {
     id: number;
     name: string;
-    advertisements: IAdvertisement[];
+    playlists: [
+      {
+        playlist: {
+          advertisements: IAdvertisement[];
+        };
+      }
+    ];
     role: string;
     createdAt: Date;
     updatedAt: Date;

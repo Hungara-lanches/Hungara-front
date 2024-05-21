@@ -30,12 +30,15 @@ async function listPlaylists(): Promise<IPlaylist[]> {
 async function listMonitors() {
   const token = cookies().get("token");
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/list-monitors`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/list-monitors-admin`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    }
+  );
 
   if (!res.ok) {
     throw new Error("Erro ao buscar monitores");
@@ -56,7 +59,9 @@ export default async function BoundMonitorPlaylist() {
   return (
     <>
       <header className="flex items-center gap-5 mb-10 flex-wrap">
-        <h1 className="text-2xl font-bold">Vincular playlists aos monitores</h1>
+        <h1 className="text-2xl font-bold">
+          Vincular playlists a novos monitores
+        </h1>
       </header>
       <Suspense fallback="Carregando...">
         <FormGrid playlists={playlists} monitors={monitors} />

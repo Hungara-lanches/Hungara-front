@@ -26,6 +26,32 @@ export async function POST(req: Request) {
   });
 }
 
+export async function PATCH(req: Request) {
+  const token = cookies().get("token");
+  const data = await req.json();
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/update-monitor`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    return Response.json("Erro ao atualizar o monitor" + (await res.text()), {
+      status: res.status,
+    });
+  }
+
+  return Response.json({
+    message: "Monitor atualizado com sucesso",
+    data,
+  });
+}
+
 export async function DELETE(req: Request) {
   const token = cookies().get("token");
   const { id } = await req.json();
