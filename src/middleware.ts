@@ -3,27 +3,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const { pathname }: { pathname: string } = request.nextUrl;
-  const token = cookies().get("token");
-
-  if (!token) return NextResponse.redirect(new URL("/login", request.url));
+  const adminToken = cookies().get("token");
+  const tokenMonitor = cookies().get("token_monitor");
 
   const userInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-admin`, {
     headers: {
-      Authorization: `Bearer ${token?.value}`,
+      Authorization: `Bearer ${adminToken?.value}`,
     },
     cache: "no-store",
   });
 
   const monitorInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor`, {
     headers: {
-      Authorization: `Bearer ${token?.value}`,
+      Authorization: `Bearer ${tokenMonitor?.value}`,
     },
     cache: "no-store",
   });
 
   let account = await userInfo.json();
 
-  if (token && !account?.user) {
+  if (tokenMonitor && !account?.user) {
     account = await monitorInfo.json();
   }
 

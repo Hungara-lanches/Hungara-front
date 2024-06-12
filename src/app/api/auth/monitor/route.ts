@@ -14,10 +14,10 @@ export async function POST(req: Request, res: Response) {
 
     if (response.ok) {
       const result = await response.json();
-      cookies().set("token", result.token, {
+      cookies().set("token_monitor", result.token, {
         httpOnly: true,
       });
-      return Response.json({ token: result.token }, { status: 200 });
+      return Response.json({ token_monitor: result.token }, { status: 200 });
     } else {
       return Response.json(
         { error: "Usuário ou senha inválidos" },

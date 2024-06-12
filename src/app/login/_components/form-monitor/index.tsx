@@ -22,9 +22,13 @@ import { ChangeEvent, useEffect } from "react";
 import AccountType from "../account-type";
 import toast from "react-hot-toast";
 
+import dynamic from "next/dynamic";
+import { useQRCode } from "next-qrcode";
+
 interface FormMonitorProps {
   monitors: IMonitor[];
   establishments: IEstablishmentList;
+  qrCode: string;
 }
 
 declare const ActiveXObject: {
@@ -41,6 +45,7 @@ interface ExtendedHTMLElement extends HTMLElement {
 export default function FormMonitor({
   monitors,
   establishments,
+  qrCode,
 }: FormMonitorProps) {
   const schema = z.object({
     establishment: z.any(),
@@ -54,13 +59,8 @@ export default function FormMonitor({
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  let element = document.body;
-
   const { push, replace } = useRouter();
-
-  useEffect(() => {
-    const establishmentId = searchParams.get("establishmentId");
-  }, [searchParams]);
+  const { SVG } = useQRCode();
 
   const {
     register,
@@ -240,6 +240,15 @@ export default function FormMonitor({
           searchParams={searchParams}
           replace={replace}
         />
+        <div className="flex justify-center items-center">
+          <SVG
+            text={"https://github.com/bunlong/next-qrcode"}
+            options={{
+              margin: 2,
+              width: 200,
+            }}
+          />
+        </div>
 
         <Button
           isLoading={isSubmitting}

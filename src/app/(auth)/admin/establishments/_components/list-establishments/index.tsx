@@ -35,11 +35,6 @@ export default function ListEstablishments({
   const searchParams = useSearchParams();
   const { replace } = useRouter();
 
-  const loadingState =
-    isLoading || establishments?.establishments.length === 0
-      ? "loading"
-      : "idle";
-
   const rowsPerPage = 10;
 
   const pages = useMemo(() => {

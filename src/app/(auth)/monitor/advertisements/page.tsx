@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 async function getMe(): Promise<IMeMonitor> {
-  const token = cookies().get("token");
+  const token = cookies().get("token_monitor");
 
   if (!token) {
     throw new Error("Not authorized");

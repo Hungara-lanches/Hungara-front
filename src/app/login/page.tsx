@@ -5,6 +5,8 @@ import FormMonitor from "./_components/form-monitor";
 import { Metadata } from "next";
 import { IMonitor } from "../../model/monitor";
 import { IEstablishmentList } from "../../model/establishment";
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -41,6 +43,34 @@ async function listEstablishments(): Promise<IEstablishmentList> {
   return res.json();
 }
 
+async function qrCodeHasRelation(qrCode: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/code-relation/${qrCode}`,
+    {
+      next: {
+        revalidate: 3000,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  const responseBody = await res.json();
+
+  return responseBody;
+}
+
+async function generateQrCode() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/generate-code`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  return res.json();
+}
+
 export default async function Login({
   searchParams,
 }: {
@@ -49,12 +79,21 @@ export default async function Login({
     accountType?: "admin" | "monitor";
   };
 }) {
+  const monitorToken = cookies().get("token_monitor");
+
   const establishmentIdQuery = searchParams?.establishmentId || "";
   const accountType = searchParams?.accountType || "admin";
 
   const monitors = await listMonitorsEstablishmentLogin(establishmentIdQuery);
 
   const establishments = await listEstablishments();
+
+  let qrCode = "";
+
+  if (accountType !== "admin") {
+    qrCode = await generateQrCode();
+  }
+  if (accountType !== "admin" && qrCode) await qrCodeHasRelation(qrCode);
 
   return (
     <>
@@ -67,6 +106,7 @@ export default async function Login({
               <FormMonitor
                 establishments={establishments}
                 monitors={monitors}
+                qrCode={qrCode}
               />
             </Suspense>
           )}

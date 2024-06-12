@@ -1,5 +1,6 @@
 "use client";
 import {
+  Button,
   Chip,
   Pagination,
   Table,
@@ -10,13 +11,14 @@ import {
   TableRow,
   Tooltip,
 } from "@nextui-org/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { IMonitor } from "../../../../../../model/monitor";
 import DeleteMonitor from "../delete-monitor";
+import { QrReader } from "react-qr-reader";
 
 interface ListMonitorProps {
   monitors: IMonitor[];
@@ -24,13 +26,13 @@ interface ListMonitorProps {
 
 export default function ListMonitors({ monitors }: ListMonitorProps) {
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [openCameraId, setOpenCameraId] = useState<number | null>(null);
+
+  const [openCamera, setOpenCamera] = useState(false);
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { replace } = useRouter();
-
-  const loadingState = isLoading || monitors?.length === 0 ? "loading" : "idle";
+  const { replace, refresh } = useRouter();
 
   const rowsPerPage = 10;
 
@@ -49,71 +51,149 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
       name: "Ações",
       uid: "actions",
     },
+    {
+      name: "Abrir Câmera",
+      uid: "openCamera",
+    },
   ];
 
-  const renderCell = useCallback((monitor: IMonitor, columnKey: unknown) => {
-    const cellValue = monitor[columnKey as keyof IMonitor];
+  useEffect(() => {
+    setOpenCamera(true);
+  }, [openCamera]);
 
-    switch (columnKey) {
-      case "name":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">{monitor.name}</p>
-          </div>
+  const handleGenerateTokenForMonitor = async (id: number) => {
+    try {
+      const res = await fetch("/api/auth/monitor/generate-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(id),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        return Response.json(result, { status: 200 });
+      } else {
+        return Response.json(
+          { error: "Erro ao retornar o token" },
+          { status: 400 }
         );
-
-      case "description":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">
-              {monitor.description || " - "}
-            </p>
-          </div>
-        );
-
-      case "activePlaylists":
-        return (
-          <div className="flex flex-col">
-            {monitor.playlists.length > 0 ? (
-              <Chip
-                className="capitalize"
-                color="success"
-                size="sm"
-                variant="flat"
-              >
-                Sim
-              </Chip>
-            ) : (
-              <Chip
-                className="capitalize"
-                color="danger"
-                size="sm"
-                variant="flat"
-              >
-                Não
-              </Chip>
-            )}
-          </div>
-        );
-
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-5">
-            <Tooltip content="Editar">
-              <Link href={`/admin/monitors/${monitor.id}`}>
-                <PencilIcon className="cursor-pointer w-5 h-5" />
-              </Link>
-            </Tooltip>
-
-            <DeleteMonitor monitor={monitor} />
-          </div>
-        );
-
-      default:
-        return cellValue;
+      }
+    } catch (error) {
+      console.log(error);
+      return Response.json({ error: "Erro ao gerar o token" }, { status: 500 });
     }
-  }, []);
+  };
 
+  const renderCell = useCallback(
+    (monitor: IMonitor, columnKey: unknown) => {
+      const cellValue = monitor[columnKey as keyof IMonitor];
+
+      switch (columnKey) {
+        case "name":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-sm capitalize">{monitor.name}</p>
+            </div>
+          );
+
+        case "description":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-sm capitalize">
+                {monitor.description || " - "}
+              </p>
+            </div>
+          );
+
+        case "activePlaylists":
+          return (
+            <div className="flex flex-col">
+              {monitor.playlists.length > 0 ? (
+                <Chip
+                  className="capitalize"
+                  color="success"
+                  size="sm"
+                  variant="flat"
+                >
+                  Sim
+                </Chip>
+              ) : (
+                <Chip
+                  className="capitalize"
+                  color="danger"
+                  size="sm"
+                  variant="flat"
+                >
+                  Não
+                </Chip>
+              )}
+            </div>
+          );
+
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-5">
+              <Tooltip content="Editar">
+                <Link href={`/admin/monitors/${monitor.id}`}>
+                  <PencilIcon className="cursor-pointer w-5 h-5" />
+                </Link>
+              </Tooltip>
+
+              <DeleteMonitor monitor={monitor} />
+            </div>
+          );
+
+        case "openCamera":
+          return (
+            <div className="relative flex items-center gap-5">
+              {openCameraId !== monitor.id ? (
+                <Button
+                  color="primary"
+                  type="button"
+                  onClick={async () => {
+                    setOpenCameraId(monitor.id);
+                    refresh();
+                    await handleGenerateTokenForMonitor(monitor.id);
+                  }}
+                >
+                  Abrir câmera
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setOpenCameraId(null);
+                      window.location.reload();
+                    }}
+                  >
+                    Fechar câmera
+                  </Button>
+                  <QrReader
+                    constraints={{ facingMode: "user" }}
+                    onResult={(result, error) => {
+                      if (!!result) {
+                        console.log(result);
+                      }
+
+                      if (!!error) {
+                        console.info(error);
+                      }
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          );
+
+        default:
+          return cellValue;
+      }
+    },
+    [openCameraId, refresh]
+  );
   function handlePageChange(page: number) {
     setPage(page);
     const params = new URLSearchParams(searchParams);
