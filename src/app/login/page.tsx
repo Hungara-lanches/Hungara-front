@@ -88,9 +88,9 @@ export default async function Login({
 
   let qrCode = "";
 
-  // if (accountType !== "admin") {
-  //   qrCode = await generateQrCode();
-  // }
+  if (accountType !== "admin") {
+    qrCode = await generateQrCode();
+  }
   // if (accountType !== "admin" && qrCode) await qrCodeHasRelation(qrCode);
 
   return (
