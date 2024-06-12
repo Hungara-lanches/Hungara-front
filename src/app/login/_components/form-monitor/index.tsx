@@ -232,7 +232,7 @@ export default function FormMonitor({
         />
         <div className="flex justify-center items-center">
           <SVG
-            text={"https://github.com/bunlong/next-qrcode"}
+            text={qrCode}
             options={{
               margin: 2,
               width: 200,

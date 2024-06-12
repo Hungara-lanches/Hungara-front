@@ -172,7 +172,7 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
                     Fechar câmera
                   </Button>
                   <QrReader
-                    constraints={{ facingMode: "user" }}
+                    constraints={{ facingMode: "environment" }}
                     onResult={(result, error) => {
                       if (!!result) {
                         console.log(result);
