@@ -79,8 +79,6 @@ export default async function Login({
     accountType?: "admin" | "monitor";
   };
 }) {
-  const monitorToken = cookies().get("token_monitor");
-
   const establishmentIdQuery = searchParams?.establishmentId || "";
   const accountType = searchParams?.accountType || "admin";
 
@@ -90,10 +88,10 @@ export default async function Login({
 
   let qrCode = "";
 
-  if (accountType !== "admin") {
-    qrCode = await generateQrCode();
-  }
-  if (accountType !== "admin" && qrCode) await qrCodeHasRelation(qrCode);
+  // if (accountType !== "admin") {
+  //   qrCode = await generateQrCode();
+  // }
+  // if (accountType !== "admin" && qrCode) await qrCodeHasRelation(qrCode);
 
   return (
     <>
