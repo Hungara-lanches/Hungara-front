@@ -12,8 +12,9 @@ import { ChangeEvent, useEffect } from "react";
 import AccountType from "../account-type";
 import toast from "react-hot-toast";
 
-import dynamic from "next/dynamic";
 import { useQRCode } from "next-qrcode";
+
+import { setCookie } from "cookies-next";
 
 interface FormMonitorProps {
   monitors: IMonitor[];
@@ -92,6 +93,44 @@ export default function FormMonitor({
       }
     }
   }
+
+  async function qrCodeHasRelation(
+    qrCode: string
+  ): Promise<{ isRelated: boolean; token: string }> {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/code-relation/${qrCode}`,
+      {
+        next: {
+          revalidate: 3000,
+        },
+      }
+    );
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+    const responseBody = await res.json();
+
+    return responseBody;
+  }
+
+  useEffect(() => {
+    async function fetchQrCodeRelation() {
+      try {
+        const result = await qrCodeHasRelation(qrCode);
+        if (result.token) {
+          setCookie("monitor_auth", result.token);
+        }
+
+        if (result?.isRelated) {
+          push("/monitor/advertisements");
+        }
+      } catch (error) {}
+    }
+    fetchQrCodeRelation();
+    const intervalId = setInterval(fetchQrCodeRelation, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   const onSubmits = async function (data: ISchema) {
     var elem = document.body;

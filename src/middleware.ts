@@ -5,6 +5,7 @@ export async function middleware(request: NextRequest) {
   const { pathname }: { pathname: string } = request.nextUrl;
   const adminToken = cookies().get("token");
   const tokenMonitor = cookies().get("token_monitor");
+  const monitorAuth = cookies().get("monitor_auth");
 
   const userInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-admin`, {
     headers: {
@@ -15,7 +16,7 @@ export async function middleware(request: NextRequest) {
 
   const monitorInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor`, {
     headers: {
-      Authorization: `Bearer ${tokenMonitor?.value}`,
+      Authorization: `Bearer ${tokenMonitor?.value || monitorAuth?.value}`,
     },
     cache: "no-store",
   });
@@ -23,6 +24,10 @@ export async function middleware(request: NextRequest) {
   let account = await userInfo.json();
 
   if (tokenMonitor && !account?.user) {
+    account = await monitorInfo.json();
+  }
+
+  if (monitorAuth && !account?.user) {
     account = await monitorInfo.json();
   }
 

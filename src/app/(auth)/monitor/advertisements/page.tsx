@@ -3,6 +3,7 @@ import { IMeMonitor } from "../../../../model/monitor";
 import { AdvertisementGrid } from "../_components/advertisement-grid";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Propagandas",
@@ -11,25 +12,29 @@ export const metadata: Metadata = {
 
 async function getMe(): Promise<IMeMonitor> {
   const token = cookies().get("token_monitor");
+  const monitorAuth = cookies().get("monitor_auth");
 
-  if (!token) {
+  if (!token && !monitorAuth) {
     throw new Error("Not authorized");
   }
+
+  const validToken = token?.value ? token?.value : monitorAuth?.value;
 
   const revalidateTime = 15 * 60 * 1000; // 15 min
 
   const monitorInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor`, {
     headers: {
-      Authorization: `Bearer ${token?.value}`,
+      Authorization: `Bearer ${validToken}`,
     },
-    cache: "no-store",
+
     next: {
       revalidate: revalidateTime,
     },
   });
 
   if (!monitorInfo.ok) {
-    throw new Error("An error occurred while fetching monitor info");
+    console.log(await monitorInfo.json());
+    throw new Error(monitorInfo.statusText);
   }
   return monitorInfo.json();
 }

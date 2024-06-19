@@ -20,6 +20,8 @@ import { IMonitor } from "../../../../../../model/monitor";
 import DeleteMonitor from "../delete-monitor";
 import { QrReader } from "react-qr-reader";
 
+import { getCookie, getCookies } from "cookies-next";
+
 interface ListMonitorProps {
   monitors: IMonitor[];
 }
@@ -29,6 +31,10 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
   const [openCameraId, setOpenCameraId] = useState<number | null>(null);
 
   const [openCamera, setOpenCamera] = useState(false);
+
+  const [cameraData, setCameraData] = useState<string | null>("");
+
+  const [monitorToken, setMonitorToken] = useState<string | null>("");
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -57,9 +63,39 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
     },
   ];
 
+  // useEffect(() => {
+  //   setOpenCamera(true);
+  // }, [openCamera]);
+
   useEffect(() => {
-    setOpenCamera(true);
-  }, [openCamera]);
+    const handleRelateTokenToCode = async () => {
+      const token = getCookie("monitor_auth");
+
+      try {
+        const result = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/relate-code-to-monitor`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              code: cameraData,
+              token: monitorToken,
+            }),
+          }
+        );
+
+        if (result.ok) {
+          setOpenCameraId(null);
+        }
+      } catch (error) {
+        console.log("erro", error);
+      }
+    };
+    handleRelateTokenToCode();
+  }, [cameraData]);
 
   const handleGenerateTokenForMonitor = async (id: number) => {
     try {
@@ -73,6 +109,7 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
 
       if (res.ok) {
         const result = await res.json();
+        setMonitorToken(result.monitor_auth);
         return Response.json(result, { status: 200 });
       } else {
         return Response.json(
@@ -94,7 +131,9 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
         case "name":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">{monitor.name}</p>
+              <p className="text-bold text-sm capitalize">
+                {monitor.name} {cameraData}
+              </p>
             </div>
           );
 
@@ -172,14 +211,19 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
                     Fechar câmera
                   </Button>
                   <QrReader
+                    className="w-64 h-64"
                     constraints={{ facingMode: "environment" }}
-                    onResult={(result, error) => {
+                    onResult={async (result, error) => {
                       if (!!result) {
-                        console.log(result);
+                        setCameraData(result.getText());
+                        // console.log(result.getText(), monitorToken);
+
+                        // const code = result.getText();
+                        // const token = getCookie("monitor_auth");
                       }
 
                       if (!!error) {
-                        console.info(error);
+                        console.log(error.cause);
                       }
                     }}
                   />
@@ -232,7 +276,7 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
             key={column.uid}
             align={column.uid === "actions" ? "center" : "start"}
           >
-            {column.name}
+            {column.name} {cameraData}
           </TableColumn>
         )}
       </TableHeader>

@@ -43,23 +43,6 @@ async function listEstablishments(): Promise<IEstablishmentList> {
   return res.json();
 }
 
-async function qrCodeHasRelation(qrCode: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_URL}/code-relation/${qrCode}`,
-    {
-      next: {
-        revalidate: 3000,
-      },
-    }
-  );
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
-  const responseBody = await res.json();
-
-  return responseBody;
-}
-
 async function generateQrCode() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/generate-code`, {
     cache: "no-store",
@@ -91,7 +74,7 @@ export default async function Login({
   if (accountType !== "admin") {
     qrCode = await generateQrCode();
   }
-  if (accountType !== "admin" && qrCode) await qrCodeHasRelation(qrCode);
+  // if (accountType !== "admin" && qrCode) await qrCodeHasRelation(qrCode);
 
   return (
     <>
