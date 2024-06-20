@@ -8,7 +8,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import AccountType from "../account-type";
 import toast from "react-hot-toast";
 
@@ -47,11 +47,25 @@ export default function FormMonitor({
 
   type ISchema = z.infer<typeof schema>;
 
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
   const searchParams = useSearchParams();
   const pathname = usePathname();
-
   const { push, replace } = useRouter();
   const { SVG } = useQRCode();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    function handleResize() {
+      setWindowWidth(window.innerWidth);
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const {
     register,
@@ -70,6 +84,7 @@ export default function FormMonitor({
   });
 
   function requestFullScreen(element: ExtendedHTMLElement) {
+    if (typeof window === "undefined") return;
     const requestMethod =
       element.requestFullscreen ||
       element.webkitRequestFullScreen ||
@@ -124,13 +139,18 @@ export default function FormMonitor({
         if (result?.isRelated) {
           push("/monitor/advertisements");
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     }
-    fetchQrCodeRelation();
-    const intervalId = setInterval(fetchQrCodeRelation, 3000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+    if (typeof window !== "undefined") {
+      fetchQrCodeRelation();
+      const intervalId = setInterval(fetchQrCodeRelation, 3000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [qrCode, push]);
 
   const onSubmits = async function (data: ISchema) {
     var elem = document.body;
@@ -175,119 +195,119 @@ export default function FormMonitor({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmits)}
-      className="space-y-6 bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12"
-    >
-      <div>
-        <label
-          htmlFor="establishment"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Estabelecimento
-        </label>
-        <div className="mt-2">
-          <Select
-            id="establishment"
-            {...register("establishment")}
-            onChange={(event) => handleSelectEstablishment(event)}
-            size="lg"
-            placeholder="Selecione um estabelecimento"
-            className="max-w-xs"
-            isInvalid={!!errors.establishment}
-            errorMessage={errors.establishment?.message as string}
-            aria-label="Selecione um estabelecimento"
-          >
-            {establishments.establishments.map((establishment) => (
-              <SelectItem key={establishment.id} value={establishment.id}>
-                {establishment.name}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
-      </div>
+    <div className="flex justify-evenly w-full items-center">
+      <SVG
+        text={qrCode}
+        options={{
+          width: 600,
+        }}
+      />
 
-      <div>
-        <label
-          htmlFor="monitor"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Monitor
-        </label>
-        <div className="mt-2">
-          <Select
-            id="monitor"
-            {...register("monitor")}
-            size="lg"
-            placeholder="Selecione um monitor"
-            className="max-w-xs"
-            isInvalid={!!errors.monitor}
-            errorMessage={errors.monitor?.message as string}
-            aria-label="Selecione um monitor"
-          >
-            {monitors.map((monitor) => (
-              <SelectItem key={monitor.id} value={monitor.id}>
-                {monitor.name}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between">
+      <form
+        onSubmit={handleSubmit(onSubmits)}
+        className="space-y-6 bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12"
+      >
+        <div>
           <label
-            htmlFor="password"
+            htmlFor="establishment"
             className="block text-sm font-medium leading-6 text-gray-900"
           >
-            Senha
+            Estabelecimento
           </label>
-        </div>
-        <div className="mt-2">
-          <Input
-            {...register("password")}
-            size="lg"
-            id="password"
-            placeholder="Senha"
-            type="password"
-            isInvalid={!!errors.password}
-            autoComplete="password"
-            startContent={
-              <MdiPassword className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
-            }
-            errorMessage={errors.password?.message as string}
-            aria-label="Senha"
-          />
-        </div>
-      </div>
-
-      <div>
-        <AccountType
-          getValues={getValues}
-          register={register}
-          pathname={pathname}
-          searchParams={searchParams}
-          replace={replace}
-        />
-        <div className="flex justify-center items-center">
-          <SVG
-            text={qrCode}
-            options={{
-              margin: 2,
-              width: 200,
-            }}
-          />
+          <div className="mt-2">
+            <Select
+              id="establishment"
+              {...register("establishment")}
+              onChange={(event) => handleSelectEstablishment(event)}
+              size="lg"
+              placeholder="Selecione um estabelecimento"
+              className="max-w-xs"
+              isInvalid={!!errors.establishment}
+              errorMessage={errors.establishment?.message as string}
+              aria-label="Selecione um estabelecimento"
+            >
+              {establishments.establishments.map((establishment) => (
+                <SelectItem key={establishment.id} value={establishment.id}>
+                  {establishment.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
         </div>
 
-        <Button
-          isLoading={isSubmitting}
-          variant="shadow"
-          type="submit"
-          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Entrar
-        </Button>
-      </div>
-    </form>
+        <div>
+          <label
+            htmlFor="monitor"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Monitor
+          </label>
+          <div className="mt-2">
+            <Select
+              id="monitor"
+              {...register("monitor")}
+              size="lg"
+              placeholder="Selecione um monitor"
+              className="max-w-xs"
+              isInvalid={!!errors.monitor}
+              errorMessage={errors.monitor?.message as string}
+              aria-label="Selecione um monitor"
+            >
+              {monitors.map((monitor) => (
+                <SelectItem key={monitor.id} value={monitor.id}>
+                  {monitor.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Senha
+            </label>
+          </div>
+          <div className="mt-2">
+            <Input
+              {...register("password")}
+              size="lg"
+              id="password"
+              placeholder="Senha"
+              type="password"
+              isInvalid={!!errors.password}
+              autoComplete="password"
+              startContent={
+                <MdiPassword className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+              }
+              errorMessage={errors.password?.message as string}
+              aria-label="Senha"
+            />
+          </div>
+        </div>
+
+        <div>
+          <AccountType
+            getValues={getValues}
+            register={register}
+            pathname={pathname}
+            searchParams={searchParams}
+            replace={replace}
+          />
+
+          <Button
+            isLoading={isSubmitting}
+            variant="shadow"
+            type="submit"
+            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Entrar
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -5,8 +5,6 @@ import FormMonitor from "./_components/form-monitor";
 import { Metadata } from "next";
 import { IMonitor } from "../../model/monitor";
 import { IEstablishmentList } from "../../model/establishment";
-import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -79,10 +77,12 @@ export default async function Login({
   return (
     <>
       <main className="bg-gray-50 flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {accountType === "admin" ? (
+        {accountType === "admin" ? (
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <FormAdmin />
-          ) : (
+          </div>
+        ) : (
+          <div className="mt-10 sm:mx-auto sm:w-full">
             <Suspense fallback="Carregando...">
               <FormMonitor
                 establishments={establishments}
@@ -90,8 +90,8 @@ export default async function Login({
                 qrCode={qrCode}
               />
             </Suspense>
-          )}
-        </div>
+          </div>
+        )}
       </main>
     </>
   );
