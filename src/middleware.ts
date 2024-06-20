@@ -5,6 +5,8 @@ export async function middleware(request: NextRequest) {
   const { pathname }: { pathname: string } = request.nextUrl;
   const adminToken = cookies().get("token");
   const tokenMonitor = cookies().get("token_monitor");
+  const employeeAuth = cookies().get("token_employee");
+
   const monitorAuth = cookies().get("monitor_auth");
 
   const userInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-admin`, {
@@ -21,6 +23,16 @@ export async function middleware(request: NextRequest) {
     cache: "no-store",
   });
 
+  const employeeInfo = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/me-employee`,
+    {
+      headers: {
+        Authorization: `Bearer ${employeeAuth?.value}`,
+      },
+      cache: "no-store",
+    }
+  );
+
   let account = await userInfo.json();
 
   if (tokenMonitor && !account?.user) {
@@ -29,6 +41,10 @@ export async function middleware(request: NextRequest) {
 
   if (monitorAuth && !account?.user) {
     account = await monitorInfo.json();
+  }
+
+  if (employeeAuth && !account?.user) {
+    account = await employeeInfo.json();
   }
 
   // Check the role and redirect based on the role
@@ -59,6 +75,13 @@ export async function middleware(request: NextRequest) {
       }
       break;
 
+    case "employee":
+      if (!request.nextUrl.pathname.startsWith("/employee/monitors")) {
+        return NextResponse.redirect(
+          new URL("/employee/monitors", request.url)
+        );
+      }
+      break;
     default:
       return NextResponse.redirect(new URL("/login", request.url));
   }

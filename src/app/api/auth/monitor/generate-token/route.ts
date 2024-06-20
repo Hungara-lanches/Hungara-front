@@ -18,7 +18,7 @@ export async function POST(req: Request, res: Response) {
 
     if (response.ok) {
       const result = await response.json();
-      cookies().set("monitor_auth", result.monitor_auth);
+
       return Response.json(result, { status: 200 });
     } else {
       return Response.json(

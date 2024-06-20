@@ -5,6 +5,7 @@ import FormMonitor from "./_components/form-monitor";
 import { Metadata } from "next";
 import { IMonitor } from "../../model/monitor";
 import { IEstablishmentList } from "../../model/establishment";
+import FormEmployee from "./_components/form-employee";
 
 export const metadata: Metadata = {
   title: "Login",
@@ -57,11 +58,11 @@ export default async function Login({
 }: {
   searchParams?: {
     establishmentId?: string;
-    accountType?: "admin" | "monitor";
+    accountType?: "admin" | "monitor" | "employee";
   };
 }) {
   const establishmentIdQuery = searchParams?.establishmentId || "";
-  const accountType = searchParams?.accountType || "admin";
+  const accountType = searchParams?.accountType || "admin" || "employee";
 
   const monitors = await listMonitorsEstablishmentLogin(establishmentIdQuery);
 
@@ -80,6 +81,10 @@ export default async function Login({
         {accountType === "admin" ? (
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <FormAdmin />
+          </div>
+        ) : accountType === "employee" ? (
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <FormEmployee />
           </div>
         ) : (
           <div className="mt-10 sm:mx-auto sm:w-full">

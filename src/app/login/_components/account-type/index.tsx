@@ -23,6 +23,8 @@ export default function AccountType({
     const params = new URLSearchParams(searchParams);
     if (getValues("accountType") === "admin") {
       params.set("accountType", "admin");
+    } else if (getValues("accountType") === "employee") {
+      params.set("accountType", "employee");
     } else {
       params.set("accountType", "monitor");
     }
@@ -36,6 +38,8 @@ export default function AccountType({
     if (accountType === "admin") {
       params.set("accountType", "admin");
       params.delete("establishmentId");
+    } else if (accountType === "employee") {
+      params.set("accountType", "employee");
     } else {
       params.set("accountType", "monitor");
     }
@@ -54,6 +58,7 @@ export default function AccountType({
     >
       <Radio value="admin">Administrador</Radio>
       <Radio value="monitor">Monitor</Radio>
+      <Radio value="employee">Funcionário</Radio>
     </RadioGroup>
   );
 }
