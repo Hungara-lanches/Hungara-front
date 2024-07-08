@@ -84,7 +84,10 @@ export default async function Monitors({
       </div>
 
       <Suspense fallback="Loading...">
-        <ListMonitors monitors={monitorsEstablishment} />
+        <ListMonitors
+          establishmentId={establishmentId}
+          monitors={monitorsEstablishment}
+        />
       </Suspense>
     </>
   );

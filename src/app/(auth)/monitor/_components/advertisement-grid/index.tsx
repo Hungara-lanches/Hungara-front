@@ -8,26 +8,61 @@ import { useRouter } from "next/navigation";
 
 interface AdvertisementGridProps {
   monitor: IMeMonitor;
+  deleteCookie: () => Promise<void>;
+  active: {
+    user: {
+      id: number;
+      isLogged: boolean;
+    };
+  };
 }
 
-export function AdvertisementGrid({ monitor }: AdvertisementGridProps) {
+export function AdvertisementGrid({
+  monitor,
+  deleteCookie,
+  active,
+}: AdvertisementGridProps) {
   const [currentAdvertisementIndex, setCurrentAdvertisementIndex] = useState(0);
+  const [isLogged, setIsLogged] = useState(active.user.isLogged);
   const videoRef = useRef<HTMLVideoElement>();
-
   const { push } = useRouter();
 
   useEffect(() => {
+    const checkUserLogged = async () => {
+      try {
+        const response = await fetch("/api/admin/monitors");
+        const data = await response.json();
+
+        if (!data.user.isLogged) {
+          await deleteCookie();
+          push("/login");
+        } else {
+          setIsLogged(true);
+        }
+      } catch (error) {
+        console.error("Failed to check user login status", error);
+      }
+    };
+
+    const intervalId = setInterval(checkUserLogged, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [deleteCookie, push]);
+
+  useEffect(() => {
     const advertisementCount =
-      monitor.user.playlists?.[0]?.playlist?.advertisements?.length;
+      monitor.user.playlists?.[0]?.playlist?.advertisements?.length || 0;
 
     const advertisementTimer = setTimeout(() => {
       setCurrentAdvertisementIndex(
         (prevIndex) => (prevIndex + 1) % advertisementCount
       );
     }, monitor.user.playlists?.[0].playlist?.advertisements[currentAdvertisementIndex]?.duration * 1000);
+
     if (currentAdvertisement?.type === "video") {
       videoRef.current?.load();
     }
+
     return () => clearTimeout(advertisementTimer);
   }, [currentAdvertisementIndex, monitor]);
 
@@ -46,7 +81,9 @@ export function AdvertisementGrid({ monitor }: AdvertisementGridProps) {
         throw new Error("An error occurred while signing out");
       }
       push("/login");
-    } catch (error) {}
+    } catch (error) {
+      console.error("Signout error", error);
+    }
   }
 
   return (
@@ -70,7 +107,7 @@ export function AdvertisementGrid({ monitor }: AdvertisementGridProps) {
           ref={videoRef as unknown as React.RefObject<HTMLVideoElement>}
           autoPlay
           muted
-          controlsList="nodownload  noremoteplayback"
+          controlsList="nodownload noremoteplayback"
         >
           <source src={currentAdvertisement?.url} />
           Your browser does not support the video tag.

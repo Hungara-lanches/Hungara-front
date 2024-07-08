@@ -63,7 +63,6 @@ export function EditMonitor({
       ...data,
       playlistIds: [data.playlistIds],
     };
-    console.log(body.playlistIds);
 
     if (body.playlistIds[0] === undefined) {
       body = {

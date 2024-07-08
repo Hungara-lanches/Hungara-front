@@ -3,14 +3,22 @@ import { IMeMonitor } from "../../../../model/monitor";
 import { AdvertisementGrid } from "../_components/advertisement-grid";
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { redirect } from "next/navigation";
+import { unstable_noStore } from "next/cache";
 
 export const metadata: Metadata = {
   title: "Propagandas",
   description: "Propagandas exibidas no monitor",
 };
 
+async function deleteCookie() {
+  "use server";
+
+  cookies().delete("token_monitor");
+}
+
 async function getMe(): Promise<IMeMonitor> {
+  unstable_noStore();
+
   const token = cookies().get("token_monitor");
   const monitorAuth = cookies().get("monitor_auth");
 
@@ -20,20 +28,47 @@ async function getMe(): Promise<IMeMonitor> {
 
   const validToken = token?.value ? token?.value : monitorAuth?.value;
 
-  const revalidateTime = 15 * 60 * 1000; // 15 min
-
   const monitorInfo = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor`, {
     headers: {
       Authorization: `Bearer ${validToken}`,
     },
-
-    next: {
-      revalidate: revalidateTime,
-    },
+    cache: "no-store",
   });
 
   if (!monitorInfo.ok) {
-    console.log(await monitorInfo.json());
+    throw new Error(monitorInfo.statusText);
+  }
+  return monitorInfo.json();
+}
+
+async function getMeActive(): Promise<{
+  user: {
+    id: number;
+    isLogged: boolean;
+  };
+}> {
+  unstable_noStore();
+
+  const token = cookies().get("token_monitor");
+  const monitorAuth = cookies().get("monitor_auth");
+
+  if (!token && !monitorAuth) {
+    throw new Error("Not authorized");
+  }
+
+  const validToken = token?.value ? token?.value : monitorAuth?.value;
+
+  const monitorInfo = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/me-monitor-active`,
+    {
+      headers: {
+        Authorization: `Bearer ${validToken}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!monitorInfo.ok) {
     throw new Error(monitorInfo.statusText);
   }
   return monitorInfo.json();
@@ -42,11 +77,17 @@ async function getMe(): Promise<IMeMonitor> {
 export default async function Advertisements() {
   const monitor = await getMe();
 
+  const active = await getMeActive();
+
   return (
     <>
       <div className="w-screen h-screen">
         <Suspense fallback="Carregando...">
-          <AdvertisementGrid monitor={monitor} />
+          <AdvertisementGrid
+            deleteCookie={deleteCookie}
+            monitor={monitor}
+            active={active}
+          />
         </Suspense>
       </div>
     </>

@@ -6,6 +6,7 @@ export interface IMonitor {
   id: number;
   name: string;
   description: string | null;
+  isLogged: boolean;
   establishment: IEstablishment;
   establishmentId: number;
   createdAt: Date;
@@ -28,6 +29,7 @@ export interface IMeMonitor {
         };
       }
     ];
+    isLogged: boolean;
     role: string;
     createdAt: Date;
     updatedAt: Date;

@@ -18,15 +18,18 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { IMonitor } from "../../../../../../model/monitor";
 import DeleteMonitor from "../delete-monitor";
-import { QrReader } from "react-qr-reader";
-
-import { getCookie, getCookies } from "cookies-next";
+import toast from "react-hot-toast";
+import refreshPath from "../../../../../actions/revalidate";
 
 interface ListMonitorProps {
   monitors: IMonitor[];
+  establishmentId: number;
 }
 
-export default function ListMonitors({ monitors }: ListMonitorProps) {
+export default function ListMonitors({
+  monitors,
+  establishmentId,
+}: ListMonitorProps) {
   const [page, setPage] = useState(1);
 
   const pathname = usePathname();
@@ -51,10 +54,51 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
       uid: "actions",
     },
     {
-      name: "Abrir Câmera",
-      uid: "openCamera",
+      name: "Monitor ativo",
+      uid: "activeMonitor",
+    },
+
+    {
+      name: "Desligar Monitor",
+      uid: "turnOffMonitor",
     },
   ];
+
+  async function handleTurnOffMonitor(monitor: IMonitor) {
+    const playlistIds = monitor.playlists.map(
+      (playlist) => (playlist as any).id
+    );
+    console.log(playlistIds);
+    try {
+      let body = {
+        ...monitor,
+        establishmentId: parseInt(establishmentId.toString()),
+      };
+
+      const res = await fetch("/api/admin/monitors", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          ...body,
+          id: monitor.id,
+          isLogged: false,
+          playlistIds,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(res.statusText);
+      }
+
+      toast.success("Monitor desligado com sucesso");
+      refreshPath(`/admin/monitors?establishmentId=${establishmentId}`);
+    } catch (error) {
+      toast.error("Erro ao desligar o monitor");
+    }
+  }
 
   const renderCell = useCallback((monitor: IMonitor, columnKey: unknown) => {
     const cellValue = monitor[columnKey as keyof IMonitor];
@@ -77,6 +121,7 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
         );
 
       case "activePlaylists":
+        console.log(monitor.playlists);
         return (
           <div className="flex flex-col">
             {monitor.playlists.length > 0 ? (
@@ -98,6 +143,44 @@ export default function ListMonitors({ monitors }: ListMonitorProps) {
                 Não
               </Chip>
             )}
+          </div>
+        );
+
+      case "activeMonitor":
+        return (
+          <div className="flex flex-col">
+            {monitor.isLogged ? (
+              <Chip
+                className="capitalize"
+                color="success"
+                size="sm"
+                variant="flat"
+              >
+                Sim
+              </Chip>
+            ) : (
+              <Chip
+                className="capitalize"
+                color="danger"
+                size="sm"
+                variant="flat"
+              >
+                Não
+              </Chip>
+            )}
+          </div>
+        );
+
+      case "turnOffMonitor":
+        return (
+          <div className="flex flex-col">
+            <Button
+              className="max-w-32 w-full"
+              color="primary"
+              onClick={() => handleTurnOffMonitor(monitor)}
+            >
+              Desligar
+            </Button>
           </div>
         );
 

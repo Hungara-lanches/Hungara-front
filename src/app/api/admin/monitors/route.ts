@@ -1,5 +1,33 @@
 import { cookies } from "next/headers";
 
+export async function GET(req: Request) {
+  const token = cookies().get("token_monitor");
+  const monitorAuth = cookies().get("monitor_auth");
+
+  if (!token && !monitorAuth) {
+    throw new Error("Not authorized");
+  }
+
+  const validToken = token?.value ? token?.value : monitorAuth?.value;
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/me-monitor-active`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${validToken}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    return Response.json("Erro ao buscar os monitores" + (await res.text()), {
+      status: res.status,
+    });
+  }
+
+  return Response.json(await res.json());
+}
+
 export async function POST(req: Request) {
   const token = cookies().get("token");
   const data = await req.json();
